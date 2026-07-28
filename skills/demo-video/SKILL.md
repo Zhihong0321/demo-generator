@@ -5,10 +5,37 @@ description: Produce narrated tutorial/demo videos of a web app by driving it wi
 
 # Demo video pipeline
 
-You are working inside a self-contained package that turns a web app repo into a
-demo-video factory. Everything you need is in this directory.
+## STEP 0 — Find the package, or clone it
+
+This file is only the front door. The pipeline is a repository: scripts, docs,
+and a vendored video engine. **If Claude Code installed this skill on its own,
+none of that is on the machine yet** — every path below is relative to the
+package root, not to this file.
+
+Check first:
+
+```bash
+ls scripts/setup.mjs docs/SOP.md vendor/argo/package.json
+```
+
+If any of those are missing, the package is not here. Clone it and work from
+there — do not improvise a replacement:
+
+```bash
+git clone https://github.com/Zhihong0321/demo-generator.git ~/demo-generator
+cd ~/demo-generator
+```
+
+Then follow `1ST_TIME_SETUP.md` in that directory.
+
+**Do not substitute a lesser deliverable.** Offering a silent screen recording,
+a captions-only video, or a markdown write-up instead of a narrated video is not
+a fallback — it abandons the thing that was asked for. If the package cannot be
+obtained (no network, no access to the repo), say exactly that and stop.
 
 ## Read these before acting
+
+All paths below are relative to the package root you just located.
 
 | File | What it settles |
 |---|---|

@@ -5,6 +5,36 @@ already fixes it or whether you still have to work around it.
 
 ---
 
+## Installation
+
+### The skill installs without the pipeline
+**Symptom:** the agent reports that the pipeline's code is missing and only the
+skill's description file exists, then offers to produce a silent recording or a
+markdown document instead.
+
+Claude Code installs a skill by copying its own directory. Every path in
+`SKILL.md` is relative to the package root, which is not present in that case.
+
+**Fix:** clone the repository and work from it.
+
+```bash
+git clone https://github.com/Zhihong0321/demo-generator.git ~/demo-generator
+cd ~/demo-generator && node scripts/setup.mjs
+```
+
+`SKILL.md` now opens with this check. Never accept the degraded alternatives —
+they drop narration, which is the whole deliverable.
+
+### macOS and Linux are unverified
+Everything in this package was built and tested on Windows. The platform-specific
+fixes are branch-guarded (`process.platform === 'win32'`) and should be inert
+elsewhere, but no full run has been done on another OS.
+
+On macOS, install ffmpeg with `brew install ffmpeg` — `setup.mjs` checks for it
+and stops if it is absent. Report anything that breaks; it belongs in this file.
+
+---
+
 ## Argo bugs — FIXED in `vendor/argo`
 
 ### `execFile('npx', ...)` cannot spawn on Windows
