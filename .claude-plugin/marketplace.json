@@ -1,0 +1,13 @@
+{
+  "name": "demo-generator",
+  "owner": {
+    "name": "Eternalgy"
+  },
+  "plugins": [
+    {
+      "name": "demo-generator",
+      "source": "./",
+      "description": "Turn any web app repo into a demo-video factory: Playwright capture, MiniMax TTS narration, ffmpeg assembly, and a versioned render archive."
+    }
+  ]
+}
