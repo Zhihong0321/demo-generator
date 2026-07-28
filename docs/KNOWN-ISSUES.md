@@ -103,6 +103,22 @@ trusting the scroll.
 
 ---
 
+### Git Bash rewrites a leading `/` in arguments
+**Symptom:** `--routes /,/customers` captures `D:/PortableGit/` instead of `/`.
+
+MSYS path conversion rewrites a bare `/` argument into the Git install
+directory. `capture-flow.mjs` detects this and stops rather than capturing the
+wrong page, but the fix is yours:
+
+```bash
+MSYS_NO_PATHCONV=1 node scripts/capture-flow.mjs --routes /,/customers ...
+node scripts/capture-flow.mjs --routes //,//customers ...      # or double the slashes
+```
+
+PowerShell and cmd are unaffected.
+
+---
+
 ## MiniMax TTS
 
 ### GroupId is not required

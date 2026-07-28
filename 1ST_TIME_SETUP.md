@@ -149,10 +149,12 @@ Tell the user, in this order:
 
 1. Setup is complete and the smoke test passed — give the duration and size.
 2. Anything that needed a workaround or is still degraded.
-3. The next action: read `docs/SOP.md` and start at Phase 0 — and that **SOP
-   Phase 1 must not be skipped**, because narration written from source code
-   rather than from screenshots produces videos that are confidently wrong and
-   pass every automated check.
+3. The next action: read `docs/SOP.md` and start at Phase 0. In Phase 1 you
+   learn the flow by **reading the codebase** — routes, templates, existing E2E
+   tests — and then confirm it with a single `scripts/capture-flow.mjs` pass.
+   Never explore the app by clicking through it with computer use; you own the
+   source, and driving the UI to discover the flow has already wasted 40+
+   minutes on this pipeline.
 
 Then ask which repo and which flow they want to film first.
 

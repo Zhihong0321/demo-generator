@@ -76,9 +76,11 @@ shareable copy in `renders/my-app/published/`. See
 
 ## The three things that will bite you
 
-**Narration written from source code lies.** Reading the DOM tells you selectors,
-not what is on screen. Walk the flow and screenshot it before writing a word of
-narration. The render succeeds either way — that's what makes this expensive.
+**Learn the flow from the codebase, not by clicking through the app.** Routes,
+templates, and existing E2E tests give you the screens, the copy, and the wait
+points in minutes. Then run `scripts/capture-flow.mjs` once to confirm the code
+matches what renders. Exploring a web app you own with computer use is the
+expensive way to learn less.
 
 **Never render against production.** Hundreds of requests and a seeded database.
 

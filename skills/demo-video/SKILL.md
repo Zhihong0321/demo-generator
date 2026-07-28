@@ -35,11 +35,23 @@ stores for it, and never write it to a file.
 
 ## The rules that matter most
 
-**1. Never skip SOP Phase 1.** Walk the flow by hand and screenshot every screen
-*before* writing narration. Narration written from reading source code
-confidently describes screens that are not on display, the video renders green,
-and no automated check catches it. This is the most expensive mistake available
-here, and it has already been made once on this pipeline.
+**1. Read the codebase to understand the flow. Do not click through the app.**
+You own the source. Routes, templates, and existing E2E tests give you the screen
+list, the copy, and the wait points in minutes. Driving the UI with computer use
+to discover what the app does has cost 40+ minutes and a fortune in tokens on
+this pipeline — it is the wrong tool for discovery.
+
+Then run **one** scripted verification pass to confirm the code matches reality:
+
+```bash
+node scripts/capture-flow.mjs --base-url <url> --routes /,/a,/b --out .flow-check
+```
+
+Look at those images once, checking for contradictions against your screen list.
+The exception is rasterized content — text baked into images, canvas, video, or
+an embedded PDF. There the DOM has no words and the pixels are the only source
+of truth, so read the screenshots carefully before narrating. Most screens are
+not this.
 
 **2. Never render against production.** A render is hundreds of requests plus a
 seeded database. Check what `baseURL` and the app's `DATABASE_URL` actually point

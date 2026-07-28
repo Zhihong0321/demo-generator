@@ -24,26 +24,55 @@ have modified three repos for nothing.
 
 ---
 
-## Phase 1 — Understand the flow *before* scripting it
+## Phase 1 — Understand the flow: read the code, then verify with one screenshot pass
 
-**This is the phase most likely to be skipped, and skipping it is the single
-most expensive mistake in this process.**
+**Read the codebase. It is the map.** Routes, templates, view handlers, and the
+nav/menu definition tell you what screens exist, what they contain, what they
+call, and what they wait on — in minutes, completely, and cheaply.
 
-Reading the DOM tells you the selectors. It does not tell you what is on the
-screen. If you write narration from a description of the markup, you will
-confidently narrate content that is not visible, and the mismatch is invisible
-to every automated check — the video renders green and says the wrong thing.
+> **Do not explore the app by clicking through it.** Computer use, manual
+> clicking, and "walk the flow as a user" are not discovery tools here. You own
+> the source. An agent that drives the UI to find out what the app does burns
+> 40+ minutes and a fortune in tokens to learn less than `grep` gives you in
+> thirty seconds. This is a real incident, not a hypothetical.
 
-For each flow you intend to film:
+### 1. Read the source (the bulk of the work)
 
-1. Open the app and walk the flow by hand, as a user.
-2. Screenshot every screen in the flow.
-3. Write the narration **against those screenshots**, not against the source.
-4. Note every point where the UI waits on something — those become readiness
-   checkpoints, not `waitForTimeout` guesses.
+- The route table, router config, or `sendFile`/render call sites → the screen list.
+- The template or component for each screen → headings, labels, fields, buttons,
+  and the copy that is actually rendered.
+- The data calls each screen makes → where the UI waits, which become readiness
+  checkpoints rather than `waitForTimeout` guesses.
+- Existing E2E tests → a working, maintained description of the flow. Read these
+  first if they exist; they are the cheapest source of all.
 
-**Gate:** a numbered list of screens, each with a screenshot and a sentence of
-narration, reviewed by someone who knows what the app actually does.
+Write the screen list and the narration from this.
+
+### 2. Verify with one scripted screenshot pass
+
+Code tells you what *should* render. Confirm what *does*:
+
+```bash
+node scripts/capture-flow.mjs --base-url http://localhost:3000 \
+  --routes /,/customers,/invoice/new --out .flow-check
+```
+
+Scripted, headless, seconds. Then look at the images once and reconcile them
+against your screen list. You are checking for **contradictions** — a heading
+that differs, an empty state where you expected data, a screen that redirects —
+not re-deriving the flow you already have.
+
+### 3. The one case where code is not enough
+
+If a screen's content is **rasterized** — text baked into images, canvas, video,
+or an embedded PDF — the DOM has no words in it and the source cannot tell you
+what is on screen. Then, and only then, the pixels are the source of truth and
+you must read the screenshots carefully before narrating.
+
+This is the exception. Most app screens are not this.
+
+**Gate:** a numbered list of screens, each with a line of narration derived from
+the source and confirmed against its screenshot. No contradictions outstanding.
 
 ---
 

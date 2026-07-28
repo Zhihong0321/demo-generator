@@ -26,9 +26,11 @@ renders/               all generated output, gitignored
 
 ## Five rules
 
-1. **Never skip SOP Phase 1.** Walk the flow and screenshot every screen before
-   writing narration. Narration written from source describes screens that are
-   not on display; the render still succeeds and nothing catches it.
+1. **Read the codebase to understand the flow — do not click through the app.**
+   Routes, templates, and existing E2E tests give you the screens, the copy, and
+   the wait points in minutes. Computer use is not a discovery tool when you own
+   the source. Then run `scripts/capture-flow.mjs` once to confirm the code
+   matches what renders.
 2. **Never render against production.** Check `baseURL` and the app's database
    target before starting. If only production exists, stop and ask.
 3. **Demo mode is presentation-only.** Never let it change what the app computes.
