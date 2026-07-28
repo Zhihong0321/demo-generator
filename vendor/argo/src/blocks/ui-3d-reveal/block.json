@@ -1,0 +1,13 @@
+{
+  "id": "ui-3d-reveal",
+  "version": "1.0.0",
+  "description": "3D-perspective reveal of a UI screenshot — rotates from a tilted/skewed entrance to a flat resting pose.",
+  "tags": ["narrative", "promo", "animated"],
+  "props": {
+    "image": { "type": "string", "required": true, "description": "URL or data URI for the screenshot/image to reveal" },
+    "caption": { "type": "string", "required": false, "example": "Dashboard view" },
+    "tiltDeg": { "type": "number", "required": false, "default": 35, "description": "Initial X-axis tilt before settling, in degrees" },
+    "perspective": { "type": "number", "required": false, "default": 1200, "description": "CSS perspective in px" }
+  },
+  "attribution": "Inspired by the hyperframes block of the same name (Apache-2.0). Implementation is original."
+}

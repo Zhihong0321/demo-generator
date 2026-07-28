@@ -1,0 +1,16 @@
+{
+  "id": "reddit-post",
+  "version": "1.0.0",
+  "description": "Reddit-style post card with subreddit badge, upvote count, and comment count.",
+  "tags": ["social", "narrative"],
+  "props": {
+    "subreddit": { "type": "string", "required": true, "example": "r/technology" },
+    "author": { "type": "string", "required": true, "example": "u/alice" },
+    "timestamp": { "type": "string", "required": false, "default": "1h ago", "example": "3h ago" },
+    "title": { "type": "string", "required": true, "example": "This one change cut our build time by 80%" },
+    "body": { "type": "string", "required": false, "description": "Optional post body or excerpt" },
+    "upvotes": { "type": "number", "required": false, "default": 0, "example": 1200 },
+    "comments": { "type": "number", "required": false, "default": 0, "example": 84 }
+  },
+  "attribution": "Inspired by the hyperframes block of the same name (Apache-2.0). Implementation is original."
+}

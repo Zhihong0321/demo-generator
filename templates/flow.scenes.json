@@ -1,0 +1,32 @@
+[
+  {
+    "scene": "intro",
+    "text": "Narration for the opening scene. Write this against a screenshot of the actual screen, not against the source code.",
+    "overlay": {
+      "type": "headline-card",
+      "kicker": "SECTION",
+      "title": "What this video shows",
+      "body": "One line of supporting copy",
+      "placement": "center",
+      "motion": "fade-in",
+      "autoBackground": true
+    }
+  },
+  {
+    "scene": "step-one",
+    "text": "Narration for the first real step. Scenes without an overlay block are narration-only, which is the normal case."
+  },
+  {
+    "scene": "outro",
+    "text": "Closing narration.",
+    "overlay": {
+      "type": "headline-card",
+      "kicker": "DONE",
+      "title": "Closing card",
+      "body": "Optional supporting line",
+      "placement": "center",
+      "motion": "fade-in",
+      "autoBackground": true
+    }
+  }
+]

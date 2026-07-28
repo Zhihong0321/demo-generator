@@ -1,0 +1,40 @@
+[
+  {
+    "scene": "intro",
+    "text": "Here is how an Eternalgy solar proposal looks on your phone. Everything your customer needs, in one link.",
+    "overlay": {
+      "type": "headline-card",
+      "kicker": "ETERNALGY",
+      "title": "The mobile solar proposal",
+      "body": "One link. The whole story.",
+      "placement": "center",
+      "motion": "fade-in",
+      "autoBackground": true
+    }
+  },
+  {
+    "scene": "browse",
+    "text": "Swipe up to move through the proposal. Each slide covers one part of the system, from the roof survey right through to the final savings."
+  },
+  {
+    "scene": "panels",
+    "text": "The panel specification is called out clearly, so your customer can see exactly which hardware they are paying for."
+  },
+  {
+    "scene": "scope",
+    "text": "The scope of works lists every item included in the package, including the T N B application and the roof survey."
+  },
+  {
+    "scene": "outro",
+    "text": "And the guarantee closes it out. Three years workmanship, one year roof leak. Send the link, and your customer has the whole story.",
+    "overlay": {
+      "type": "headline-card",
+      "kicker": "COVERED",
+      "title": "3 years workmanship",
+      "body": "Plus 1 year roof leak guarantee",
+      "placement": "center",
+      "motion": "fade-in",
+      "autoBackground": true
+    }
+  }
+]

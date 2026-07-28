@@ -1,0 +1,238 @@
+/**
+ * TTS Engine interface and WAV utilities for Argo.
+ */
+
+import * as childProcess from 'node:child_process';
+
+export interface TTSEngineOptions {
+  voice?: string;
+  speed?: number;
+  lang?: string;
+}
+
+export interface TTSEngineMetadata {
+  engine: string;
+  model?: string;
+  instructions?: string;
+  [key: string]: unknown;
+}
+
+export interface TTSEngine {
+  generate(text: string, options: TTSEngineOptions): Promise<Buffer>;
+  /** Return metadata about this engine for pipeline provenance tracking. */
+  describe?(): TTSEngineMetadata;
+}
+
+/**
+ * Split long text into chunks at sentence boundaries for better TTS quality.
+ * Each chunk is between minChars and maxChars, split at sentence-ending punctuation.
+ */
+export function splitTextForTTS(
+  text: string,
+  { minChars = 80, maxChars = 500 }: { minChars?: number; maxChars?: number } = {},
+): string[] {
+  const trimmed = text.trim();
+  if (!trimmed) return [];
+  if (trimmed.length <= maxChars) return [trimmed];
+
+  // Split on sentence-ending punctuation followed by space
+  const sentences = trimmed.match(/[^.!?]+[.!?]+[\s]*/g) ?? [trimmed];
+  const chunks: string[] = [];
+  let current = '';
+
+  for (const sentence of sentences) {
+    const s = sentence.trim();
+    if (!s) continue;
+
+    if (current && (current.length + s.length + 1) > maxChars) {
+      chunks.push(current.trim());
+      current = s;
+    } else {
+      current = current ? current + ' ' + s : s;
+    }
+
+    // Flush if we've reached a good size
+    if (current.length >= minChars && current.match(/[.!?]\s*$/)) {
+      chunks.push(current.trim());
+      current = '';
+    }
+  }
+  if (current.trim()) chunks.push(current.trim());
+  return chunks.length > 0 ? chunks : [trimmed];
+}
+
+/**
+ * Concatenate Float32Array audio chunks with optional silence gap between them.
+ */
+export function concatSamples(chunks: Float32Array[], sampleRate: number, gapMs = 300): Float32Array {
+  if (chunks.length === 0) return new Float32Array(0);
+  if (chunks.length === 1) return chunks[0];
+
+  const gapSamples = Math.round((gapMs / 1000) * sampleRate);
+  const totalLen = chunks.reduce((sum, c) => sum + c.length, 0) + gapSamples * (chunks.length - 1);
+  const result = new Float32Array(totalLen);
+  let offset = 0;
+  for (let i = 0; i < chunks.length; i++) {
+    result.set(chunks[i], offset);
+    offset += chunks[i].length;
+    if (i < chunks.length - 1) offset += gapSamples; // silence gap
+  }
+  return result;
+}
+
+/**
+ * Creates a valid WAV file buffer from Float32Array samples.
+ * Format: mono, 32-bit IEEE float, given sample rate.
+ */
+export function createWavBuffer(samples: Float32Array, sampleRate = 24000): Buffer {
+  const numChannels = 1;
+  const bitsPerSample = 32;
+  const bytesPerSample = bitsPerSample / 8;
+  const blockAlign = numChannels * bytesPerSample;
+  const byteRate = sampleRate * blockAlign;
+  const dataSize = samples.length * bytesPerSample;
+  const headerSize = 44;
+
+  const buf = Buffer.alloc(headerSize + dataSize);
+
+  // RIFF header
+  buf.write('RIFF', 0, 'ascii');
+  buf.writeUInt32LE(headerSize + dataSize - 8, 4);
+  buf.write('WAVE', 8, 'ascii');
+
+  // fmt chunk
+  buf.write('fmt ', 12, 'ascii');
+  buf.writeUInt32LE(16, 16);          // fmt chunk size
+  buf.writeUInt16LE(3, 20);           // audioFormat = 3 (IEEE float)
+  buf.writeUInt16LE(numChannels, 22);
+  buf.writeUInt32LE(sampleRate, 24);
+  buf.writeUInt32LE(byteRate, 28);
+  buf.writeUInt16LE(blockAlign, 32);
+  buf.writeUInt16LE(bitsPerSample, 34);
+
+  // data chunk
+  buf.write('data', 36, 'ascii');
+  buf.writeUInt32LE(dataSize, 40);
+
+  // sample data
+  for (let i = 0; i < samples.length; i++) {
+    buf.writeFloatLE(samples[i], headerSize + i * bytesPerSample);
+  }
+
+  return buf;
+}
+
+export interface WavHeader {
+  sampleRate: number;
+  numChannels: number;
+  bitsPerSample: number;
+  audioFormat: number;
+  dataSize: number;
+  dataOffset: number;
+  durationMs: number;
+}
+
+/**
+ * Parses a WAV file header. Searches for the 'data' chunk rather than
+ * assuming a fixed offset.
+ */
+export function parseWavHeader(wav: Buffer): WavHeader {
+  if (wav.length < 44) {
+    throw new Error('Buffer too small to be a valid WAV file');
+  }
+  if (wav.toString('ascii', 0, 4) !== 'RIFF') {
+    throw new Error('Not a valid WAV file: missing RIFF header');
+  }
+  if (wav.toString('ascii', 8, 12) !== 'WAVE') {
+    throw new Error('Not a valid WAV file: missing WAVE marker');
+  }
+
+  // Validate and parse fmt chunk (expected at byte 12)
+  if (wav.toString('ascii', 12, 16) !== 'fmt ') {
+    throw new Error('Not a valid WAV file: fmt chunk not found at expected offset');
+  }
+  const audioFormat = wav.readUInt16LE(20);
+  const numChannels = wav.readUInt16LE(22);
+  const sampleRate = wav.readUInt32LE(24);
+  const bitsPerSample = wav.readUInt16LE(34);
+
+  // Search for 'data' chunk
+  let offset = 12; // after 'WAVE'
+  let dataSize = 0;
+  let dataOffset = 0;
+
+  while (offset < wav.length - 8) {
+    const chunkId = wav.toString('ascii', offset, offset + 4);
+    const chunkSize = wav.readUInt32LE(offset + 4);
+
+    if (chunkId === 'data') {
+      dataSize = chunkSize;
+      dataOffset = offset + 8;
+      break;
+    }
+
+    offset += 8 + chunkSize;
+  }
+
+  if (dataOffset === 0) {
+    throw new Error('No data chunk found in WAV file');
+  }
+
+  // When ffmpeg pipes WAV to stdout, it can't seek back to write the final
+  // data size, so it writes 0xFFFFFFFF. Use actual buffer length instead.
+  if (dataSize === 0xFFFFFFFF || dataSize > wav.length - dataOffset) {
+    dataSize = wav.length - dataOffset;
+  }
+
+  const bytesPerSample = bitsPerSample / 8;
+  const totalSamples = dataSize / (bytesPerSample * numChannels);
+  const durationMs = (totalSamples / sampleRate) * 1000;
+
+  return {
+    sampleRate,
+    numChannels,
+    bitsPerSample,
+    audioFormat,
+    dataSize,
+    dataOffset,
+    durationMs,
+  };
+}
+
+/**
+ * Convert arbitrary audio (MP3, OGG, PCM, etc.) to Argo's WAV format
+ * (mono, Float32, 24kHz) using ffmpeg.
+ */
+export function convertToWav(audioBuffer: Buffer): Buffer {
+  const { execFileSync } = childProcess;
+  const result = execFileSync('ffmpeg', [
+    '-i', 'pipe:0',
+    '-f', 'wav',
+    '-acodec', 'pcm_f32le',
+    '-ac', '1',
+    '-ar', '24000',
+    'pipe:1',
+  ], { input: audioBuffer, stdio: ['pipe', 'pipe', 'pipe'], maxBuffer: 50 * 1024 * 1024 });
+  return result;
+}
+
+/**
+ * Creates a mock TTS engine that produces silent WAV buffers of the given
+ * duration and records all calls for test assertions.
+ */
+export function createMockTTSEngine(
+  durationMs = 500,
+): TTSEngine & { calls: Array<{ text: string; options: TTSEngineOptions }> } {
+  const calls: Array<{ text: string; options: TTSEngineOptions }> = [];
+
+  return {
+    calls,
+    async generate(text: string, options: TTSEngineOptions): Promise<Buffer> {
+      calls.push({ text, options });
+      const sampleRate = 24000;
+      const numSamples = Math.round((durationMs / 1000) * sampleRate);
+      const samples = new Float32Array(numSamples); // zeros = silence
+      return createWavBuffer(samples, sampleRate);
+    },
+  };
+}

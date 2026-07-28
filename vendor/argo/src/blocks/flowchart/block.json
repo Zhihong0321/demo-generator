@@ -1,0 +1,21 @@
+{
+  "id": "flowchart",
+  "version": "1.0.0",
+  "description": "Vertical flowchart with stacked node cards and connecting arrows. Nodes reveal in sequence.",
+  "tags": ["narrative", "diagram", "animated"],
+  "props": {
+    "title": { "type": "string", "required": false, "example": "Pipeline" },
+    "nodes": {
+      "type": "array",
+      "required": true,
+      "description": "Array of { label: string, kind?: 'default' | 'success' | 'warn' | 'accent' }",
+      "example": [
+        { "label": "Trigger" },
+        { "label": "Process", "kind": "accent" },
+        { "label": "Done", "kind": "success" }
+      ]
+    },
+    "accentColor": { "type": "string", "required": false, "default": "#0ea5e9" }
+  },
+  "attribution": "Inspired by the hyperframes block of the same name (Apache-2.0). Implementation is original."
+}

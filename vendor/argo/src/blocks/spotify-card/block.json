@@ -1,0 +1,13 @@
+{
+  "id": "spotify-card",
+  "version": "1.0.0",
+  "description": "Compact Spotify-style now-playing card. Decorative insert.",
+  "tags": ["decorative"],
+  "props": {
+    "track": { "type": "string", "required": true },
+    "artist": { "type": "string", "required": true },
+    "albumArt": { "type": "string", "required": false, "description": "URL or data URI" },
+    "elapsed": { "type": "number", "required": true, "description": "Seconds elapsed" },
+    "total": { "type": "number", "required": true, "description": "Total duration in seconds" }
+  }
+}

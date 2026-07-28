@@ -1,0 +1,13 @@
+{
+  "id": "logo-outro",
+  "version": "1.0.0",
+  "description": "End-card logo reveal: brand logo + title + optional tagline with scale-in entrance.",
+  "tags": ["narrative", "outro", "animated"],
+  "props": {
+    "logo": { "type": "string", "required": false, "description": "URL or data URI for the brand logo" },
+    "title": { "type": "string", "required": true, "example": "Argo" },
+    "tagline": { "type": "string", "required": false, "example": "Demo videos, locally" },
+    "accentColor": { "type": "string", "required": false, "default": "#0ea5e9", "example": "#0ea5e9" }
+  },
+  "attribution": "Inspired by the hyperframes block of the same name (Apache-2.0). Implementation is original."
+}

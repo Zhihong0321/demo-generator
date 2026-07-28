@@ -1,0 +1,11 @@
+{
+  "id": "yt-lower-third",
+  "version": "1.0.0",
+  "description": "YouTube-style lower third — name + subtitle with an accent bar. Good for speaker intros.",
+  "tags": ["styling", "identification"],
+  "props": {
+    "name": { "type": "string", "required": true, "example": "Jane Doe" },
+    "subtitle": { "type": "string", "required": true, "example": "Engineering Lead" },
+    "accentColor": { "type": "string", "required": false, "default": "#ef4444" }
+  }
+}

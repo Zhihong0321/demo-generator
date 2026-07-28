@@ -1,0 +1,14 @@
+{
+  "id": "x-post",
+  "version": "1.0.0",
+  "description": "Social post card mimicking X/Twitter styling — for social proof narrative inserts.",
+  "tags": ["social", "narrative"],
+  "props": {
+    "handle": { "type": "string", "required": true, "example": "@jane" },
+    "name": { "type": "string", "required": true, "example": "Jane Doe" },
+    "body": { "type": "string", "required": true, "example": "this is exactly what I needed" },
+    "timestamp": { "type": "string", "required": false, "default": "now", "example": "2m" },
+    "avatar": { "type": "string", "required": false, "description": "URL or data URI" },
+    "verified": { "type": "boolean", "required": false, "default": false }
+  }
+}

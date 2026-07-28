@@ -1,0 +1,14 @@
+{
+  "id": "instagram-follow",
+  "version": "1.0.0",
+  "description": "Instagram-style follow notification card with avatar, name, and pulsing Follow button.",
+  "tags": ["social", "notification", "animated"],
+  "props": {
+    "handle": { "type": "string", "required": true, "example": "@jane" },
+    "name": { "type": "string", "required": true, "example": "Jane Doe" },
+    "avatar": { "type": "string", "required": false, "description": "URL or data URI for the avatar image" },
+    "isFollowing": { "type": "boolean", "required": false, "default": false, "description": "When true, renders a 'Following' pill instead of the animated Follow button" },
+    "verified": { "type": "boolean", "required": false, "default": false }
+  },
+  "attribution": "Inspired by the hyperframes block of the same name (Apache-2.0). Implementation is original."
+}

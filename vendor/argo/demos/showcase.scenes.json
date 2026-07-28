@@ -1,0 +1,177 @@
+[
+  {
+    "scene": "hero",
+    "text": "Your demo is a script, not a screen recording. Argo turns a Playwright walkthrough into a polished product video with voiceover, camera direction, and smart export built in.",
+    "speed": 0.92,
+    "overlay": {
+      "type": "headline-card",
+      "kicker": "ARGO",
+      "title": "Demos as code.",
+      "body": "Voiceover, overlays, camera effects, preview, and export — one pipeline.",
+      "placement": "top-right",
+      "motion": {
+        "type": "gsap",
+        "in": {
+          "from": { "y": -30, "opacity": 0, "scale": 0.92 },
+          "duration": 0.55,
+          "ease": "back.out"
+        },
+        "out": {
+          "to": { "opacity": 0, "y": -20 },
+          "duration": 0.35,
+          "ease": "power2.in"
+        }
+      },
+      "autoBackground": true
+    }
+  },
+  {
+    "scene": "authoring",
+    "text": "Start with argo init, convert an existing Playwright test, or import any screen recording with argo import. Scenes, narration, and overlays live in one manifest.",
+    "speed": 0.92,
+    "overlay": {
+      "type": "headline-card",
+      "kicker": "AUTHORING",
+      "title": "Playwright is the source of truth.",
+      "body": "Scaffold, convert, or write from scratch.",
+      "placement": "top-left",
+      "motion": "slide-in",
+      "autoBackground": true
+    }
+  },
+  {
+    "scene": "voiceover",
+    "text": "Seven TTS engines. Start local with Kokoro, bring a HuggingFace model, switch to open-a-eye or Eleven Labs and many more for the polished cut, or clone your own voice with MLX audio.",
+    "speed": 0.92,
+    "overlay": {
+      "type": "lower-third",
+      "text": "7 engines — local, cloud, or your own voice",
+      "placement": "top-right",
+      "motion": "fade-in",
+      "autoBackground": true
+    }
+  },
+  {
+    "scene": "preview",
+    "text": "Preview turns your recording into an edit bay. Scrub by scene, rewrite a line, drag overlays to snap them into position, and re-export without re-recording.",
+    "speed": 0.92,
+    "overlay": {
+      "type": "headline-card",
+      "kicker": "PREVIEW",
+      "title": "Edit without re-recording.",
+      "body": "Scrub, rewrite, regenerate, export.",
+      "placement": "top-left",
+      "motion": "slide-in",
+      "autoBackground": true
+    }
+  },
+  {
+    "scene": "camera",
+    "text": "Direct the viewer's eye with code. Spotlight a button, pulse a focus ring, dim the noise, highlight the cursor, zoom into a card, add motion blur to camera moves, and celebrate with confetti.",
+    "speed": 0.92,
+    "overlay": {
+      "type": "callout",
+      "text": "Camera direction, not post-production",
+      "placement": "top-left",
+      "motion": "fade-in",
+      "autoBackground": true
+    },
+    "effects": [
+      {
+        "type": "confetti",
+        "spread": "burst",
+        "pieces": 150,
+        "duration": 3000
+      }
+    ]
+  },
+  {
+    "scene": "export",
+    "text": "Export is where the polish lands. Add a shader transition, generate background music from a prompt right in the preview, stamp a watermark, freeze a hero frame, and ship subtitles, chapters, reports, and social formats from the same timeline — GPU-accelerated on every platform.",
+    "speed": 0.92,
+    "overlay": {
+      "type": "headline-card",
+      "kicker": "EXPORT",
+      "title": "Smart export, not just encoding.",
+      "body": "Shader transitions, music, watermark, freeze-frame, chapters, GPU encoding — one timeline.",
+      "placement": "top-right",
+      "motion": "slide-in",
+      "autoBackground": true
+    }
+  },
+  {
+    "scene": "studio",
+    "text": "The studio polish pack. Frame your recording on any background. Drop in blocks from the catalog for posts, notifications, metrics, flowcharts, and brand outros. Layer GreenSock-driven motion on headlines and blocks, add motion blur to camera zooms, slow down a hero scene to half speed, and drop arrow annotations to guide the viewer's eye.",
+    "speed": 0.92,
+    "overlay": {
+      "type": "headline-card",
+      "kicker": "STUDIO POLISH",
+      "title": "The Screen Studio look, in config.",
+      "body": "Frame, block catalog, GSAP motion, motion blur, per-scene speed, arrows.",
+      "placement": "top-right",
+      "motion": "slide-in",
+      "autoBackground": true
+    }
+  },
+  {
+    "scene": "ops",
+    "text": "As your demo catalog grows, Argo scales with it. Validate catches wiring bugs, doctor checks the environment, pipeline dash dash all renders everything, and the dashboard shows status at a glance.",
+    "speed": 0.92,
+    "overlay": {
+      "type": "lower-third",
+      "text": "validate · doctor · pipeline --all · dashboard",
+      "placement": "top-right",
+      "motion": "fade-in",
+      "autoBackground": true
+    }
+  },
+  {
+    "scene": "code",
+    "text": "Under the hood, it is still Playwright. A few helpers for narration, overlays, typing, and camera effects turn familiar test code into a demo system.",
+    "speed": 0.92,
+    "overlay": {
+      "type": "callout",
+      "text": "Still Playwright. Just more cinematic.",
+      "placement": "top-left",
+      "motion": "fade-in",
+      "autoBackground": true
+    }
+  },
+  {
+    "scene": "closing",
+    "text": "Overlays adapt to your page. Toggle the theme, and the overlay contrast follows automatically. One pipeline, every output you need.",
+    "speed": 0.92,
+    "overlay": {
+      "type": "headline-card",
+      "title": "npm i -D @argo-video/cli",
+      "body": "npx argo init && npx argo pipeline my-demo",
+      "placement": "top-right",
+      "motion": "fade-in",
+      "autoBackground": true
+    }
+  },
+  {
+    "scene": "mic-drop",
+    "text": "This demo was recorded by Argo. Directed by code. Shipped by one command.",
+    "voice": "am_michael",
+    "speed": 0.92,
+    "overlay": {
+      "type": "block",
+      "block": "logo-outro",
+      "props": {
+        "title": "Argo",
+        "tagline": "Directed by code. Shipped by one command.",
+        "accentColor": "#60a5fa"
+      },
+      "placement": "center",
+      "autoBackground": true
+    },
+    "post": [
+      {
+        "type": "freeze",
+        "atMs": 900,
+        "durationMs": 700
+      }
+    ]
+  }
+]

@@ -1,0 +1,13 @@
+{
+  "id": "macos-notification",
+  "version": "1.0.0",
+  "description": "macOS-style notification banner — ideal for simulating in-product events (new signups, messages).",
+  "tags": ["system", "narrative"],
+  "props": {
+    "appName": { "type": "string", "required": true, "example": "Argo" },
+    "title": { "type": "string", "required": true, "example": "New signup" },
+    "body": { "type": "string", "required": true, "example": "jane@example.com just joined" },
+    "timestamp": { "type": "string", "required": false, "default": "now", "example": "2m ago" },
+    "appIcon": { "type": "string", "required": false, "description": "URL or data URI" }
+  }
+}

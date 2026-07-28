@@ -1,0 +1,12 @@
+{
+  "id": "tiktok-follow",
+  "version": "1.0.0",
+  "description": "TikTok-style side overlay with rotating avatar ring and follow CTA.",
+  "tags": ["social", "notification", "animated"],
+  "props": {
+    "handle": { "type": "string", "required": true, "example": "@jane" },
+    "name": { "type": "string", "required": true, "example": "Jane Doe" },
+    "avatar": { "type": "string", "required": false, "description": "URL or data URI for the avatar image" }
+  },
+  "attribution": "Inspired by the hyperframes block of the same name (Apache-2.0). Implementation is original."
+}

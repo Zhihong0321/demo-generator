@@ -1,0 +1,19 @@
+[
+  {
+    "scene": "intro",
+    "text": "This is the install smoke test. If you can hear this sentence, the text to speech engine is working.",
+    "overlay": {
+      "type": "headline-card",
+      "kicker": "SMOKE TEST",
+      "title": "Pipeline check",
+      "body": "Capture, narration, and assembly",
+      "placement": "center",
+      "motion": "fade-in",
+      "autoBackground": true
+    }
+  },
+  {
+    "scene": "calculate",
+    "text": "The demo taps a button and waits for the app's readiness signal before continuing."
+  }
+]

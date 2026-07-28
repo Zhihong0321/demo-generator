@@ -1,0 +1,40 @@
+[
+  {
+    "scene": "intro",
+    "text": "Argo now ships five WebGL shader transitions.",
+    "overlay": {
+      "type": "headline-card",
+      "kicker": "SHADERS",
+      "title": "Cinematic scene transitions",
+      "body": "Pre-rendered GPU shaders, content-addressed cache",
+      "placement": "center",
+      "motion": "fade-in",
+      "autoBackground": true
+    }
+  },
+  {
+    "scene": "crosswarp",
+    "text": "Crosswarp — a liquid horizontal morph between scenes.",
+    "overlay": { "type": "callout", "text": "crosswarp", "placement": "top-left" }
+  },
+  {
+    "scene": "swirl",
+    "text": "Swirl — rotational blend with a midpoint flash.",
+    "overlay": { "type": "callout", "text": "swirl", "placement": "top-left" }
+  },
+  {
+    "scene": "ripple",
+    "text": "Ripple — wave distortion originating from the centre.",
+    "overlay": { "type": "callout", "text": "ripple", "placement": "top-left" }
+  },
+  {
+    "scene": "luma-mask",
+    "text": "Luma mask — directional wipe with a soft edge.",
+    "overlay": { "type": "callout", "text": "luma-mask", "placement": "top-left" }
+  },
+  {
+    "scene": "light-leak",
+    "text": "Light leak — film-style warm flash between scenes.",
+    "overlay": { "type": "callout", "text": "light-leak", "placement": "top-left" }
+  }
+]

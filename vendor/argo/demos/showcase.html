@@ -1,0 +1,1509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1920" />
+  <title>Argo — Turn Playwright demos into polished product videos</title>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #090b11;
+      --bg-elevated: #0f1320;
+      --bg-card: rgba(17, 23, 38, 0.92);
+      --bg-card-hover: rgba(20, 28, 46, 0.96);
+      --border: rgba(148, 163, 184, 0.14);
+      --border-strong: rgba(96, 165, 250, 0.28);
+      --text: #edf2ff;
+      --text-muted: #9ca9c6;
+      --text-dim: #67728f;
+      --accent: #60a5fa;
+      --accent-2: #22d3ee;
+      --accent-3: #a78bfa;
+      --success: #4ade80;
+      --warning: #f59e0b;
+      --danger: #fb7185;
+      --shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: "SF Mono", "Fira Code", "Cascadia Code", Consolas, monospace;
+    }
+
+    :root.light {
+      --bg: #f4f7ff;
+      --bg-elevated: #ffffff;
+      --bg-card: rgba(255, 255, 255, 0.92);
+      --bg-card-hover: rgba(250, 251, 255, 0.98);
+      --border: rgba(15, 23, 42, 0.08);
+      --border-strong: rgba(37, 99, 235, 0.25);
+      --text: #0f172a;
+      --text-muted: #475569;
+      --text-dim: #94a3b8;
+      --shadow: 0 24px 70px rgba(15, 23, 42, 0.08);
+    }
+
+    html {
+      font-size: 16px;
+      /* Smooth-scroll + scroll-snap removed for argo recordings — they leave
+       * the page visually catching up after scrollIntoView resolves, putting
+       * the next scene's audio ahead of its visible content. Keep instant
+       * scroll for deterministic frame capture. */
+    }
+
+    body {
+      background:
+        radial-gradient(circle at 20% 20%, rgba(96, 165, 250, 0.16), transparent 32%),
+        radial-gradient(circle at 80% 0%, rgba(167, 139, 250, 0.12), transparent 26%),
+        linear-gradient(180deg, var(--bg-elevated), var(--bg));
+      color: var(--text);
+      font-family: var(--font-sans);
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body, nav, section, footer, .feature-card, .terminal-box, .preview-shell, .code-wrap {
+      transition: background-color 0.35s ease, color 0.35s ease, border-color 0.35s ease;
+    }
+
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 72px;
+      background: rgba(9, 11, 17, 0.76);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    :root.light nav {
+      background: rgba(244, 247, 255, 0.82);
+    }
+
+    .nav-logo {
+      color: var(--accent);
+      text-decoration: none;
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+    }
+
+    .brand-slash {
+      display: inline-block;
+      margin-left: -0.06em;
+      transform: translateY(-0.01em) skewX(-10deg);
+      background: linear-gradient(180deg, var(--accent-2), var(--accent-3));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 22px rgba(34, 211, 238, 0.22);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.88rem;
+      letter-spacing: 0.04em;
+      transition: color 0.2s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--text);
+    }
+
+    .theme-toggle {
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-muted);
+      border-radius: 999px;
+      padding: 10px 14px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.95rem;
+    }
+
+    .theme-toggle:hover {
+      border-color: var(--border-strong);
+      color: var(--text);
+    }
+
+    .theme-toggle .icon-sun { display: none; }
+    .theme-toggle .icon-moon { display: inline; }
+    :root.light .theme-toggle .icon-sun { display: inline; }
+    :root.light .theme-toggle .icon-moon { display: none; }
+
+    section {
+      position: relative;
+      min-height: 100vh;
+      padding: 116px 72px 72px;
+      display: flex;
+      align-items: center;
+      scroll-snap-align: start;
+    }
+
+    section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 72px;
+      right: 72px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+    }
+
+    #hero::before {
+      display: none;
+    }
+
+    .section-inner {
+      width: min(1320px, 100%);
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: 2.2rem;
+      line-height: 1.12;
+      letter-spacing: -0.03em;
+      margin-bottom: 10px;
+      max-width: 920px;
+    }
+
+    .section-subtitle {
+      font-size: 1rem;
+      color: var(--text-muted);
+      max-width: 760px;
+      margin-bottom: 28px;
+    }
+
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-top: 132px;
+    }
+
+    .hero-shell {
+      width: min(1320px, 100%);
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 36px;
+      align-items: center;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      border-radius: 999px;
+      border: 1px solid var(--border-strong);
+      background: rgba(96, 165, 250, 0.08);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--accent);
+      margin-bottom: 24px;
+    }
+
+    .hero-title {
+      font-size: 6.7rem;
+      line-height: 0.95;
+      letter-spacing: -0.06em;
+      margin-bottom: 24px;
+    }
+
+    .hero-title .brand-slash {
+      margin-left: -0.1em;
+      transform: translateY(-0.03em) skewX(-10deg);
+    }
+
+    .hero-copy {
+      font-size: 1.3rem;
+      color: var(--text-muted);
+      max-width: 720px;
+      margin-bottom: 28px;
+    }
+
+    .hero-copy strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .hero-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+
+    .hero-motto {
+      margin-top: -6px;
+      margin-bottom: 30px;
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+      letter-spacing: 0.04em;
+    }
+
+    .hero-badge,
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.5);
+      border: 1px solid var(--border);
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      color: var(--text-muted);
+    }
+
+    :root.light .hero-badge,
+    :root.light .pill {
+      background: rgba(255, 255, 255, 0.7);
+    }
+
+    .hero-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #fff;
+      font-weight: 700;
+      padding: 16px 28px;
+      border-radius: 14px;
+      box-shadow: 0 18px 40px rgba(34, 211, 238, 0.18);
+    }
+
+    .terminal-box,
+    .code-wrap,
+    .preview-shell {
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      background: rgba(6, 10, 20, 0.9);
+    }
+
+    :root.light .terminal-box,
+    :root.light .code-wrap,
+    :root.light .preview-shell {
+      background: rgba(255, 255, 255, 0.96);
+    }
+
+    .terminal-bar,
+    .code-bar,
+    .shell-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 999px;
+    }
+
+    .dot.red { background: #fb7185; }
+    .dot.yellow { background: #fbbf24; }
+    .dot.green { background: #4ade80; }
+
+    .bar-label {
+      margin-left: auto;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-dim);
+    }
+
+    .terminal-body {
+      padding: 28px 30px;
+    }
+
+    .terminal-line {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: var(--font-mono);
+      font-size: 1.08rem;
+      color: var(--text);
+      white-space: nowrap;
+    }
+
+    .terminal-prompt { color: var(--success); }
+    .cmd-name { color: var(--accent-2); }
+    .cmd-sub { color: var(--accent-3); }
+    .cmd-arg { color: var(--success); }
+
+    .terminal-meta {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-top: 22px;
+    }
+
+    .terminal-meta .meta-card {
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px;
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .meta-label {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      margin-bottom: 10px;
+    }
+
+    .meta-value {
+      font-size: 1rem;
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .features-grid.cols-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .feature-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2), var(--accent-3));
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .feature-card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--border-strong);
+    }
+
+    .feature-card:hover::before {
+      opacity: 1;
+    }
+
+    .feature-kicker {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      color: var(--accent);
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .feature-name {
+      font-size: 1.35rem;
+      letter-spacing: -0.03em;
+      margin-bottom: 12px;
+    }
+
+    .inline-code {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 10px;
+      background: rgba(96, 165, 250, 0.1);
+      border: 1px solid rgba(96, 165, 250, 0.18);
+      color: var(--accent);
+      font-family: var(--font-mono);
+      font-size: 0.86em;
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      vertical-align: 0.04em;
+    }
+
+    .feature-desc {
+      color: var(--text-muted);
+      font-size: 0.97rem;
+      line-height: 1.7;
+    }
+
+    .feature-tag {
+      display: inline-block;
+      margin-top: 18px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(96, 165, 250, 0.1);
+      border: 1px solid rgba(96, 165, 250, 0.18);
+      color: var(--accent);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+    }
+
+    .snippet {
+      margin-top: 18px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: rgba(2, 6, 23, 0.78);
+      border: 1px solid var(--border);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.8;
+      overflow: hidden;
+    }
+
+    .snippet .k { color: var(--accent-3); }
+    .snippet .p { color: var(--text-dim); }
+    .snippet .s { color: var(--success); }
+    .snippet .n { color: var(--accent); }
+
+    .preview-shell {
+      display: grid;
+      grid-template-columns: 290px 1fr 320px;
+      gap: 1px;
+      background: var(--border);
+    }
+
+    .preview-panel {
+      background: var(--bg-card);
+      padding: 24px;
+    }
+
+    .preview-scene {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px 16px;
+      background: rgba(255, 255, 255, 0.02);
+      margin-bottom: 12px;
+    }
+
+    .preview-scene.active {
+      border-color: var(--border-strong);
+      box-shadow: inset 0 0 0 1px rgba(96, 165, 250, 0.28);
+    }
+
+    .preview-scene strong {
+      display: block;
+      font-size: 0.92rem;
+      margin-bottom: 4px;
+    }
+
+    .preview-scene span {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .preview-chip-row,
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .preview-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    .preview-stage {
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      min-height: 360px;
+      padding: 24px;
+      background:
+        radial-gradient(circle at 50% 30%, rgba(96, 165, 250, 0.18), transparent 34%),
+        linear-gradient(180deg, rgba(15, 23, 42, 0.75), rgba(2, 6, 23, 0.92));
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      gap: 16px;
+    }
+
+    .preview-stage h3 {
+      font-size: 2rem;
+      line-height: 1.05;
+      max-width: 420px;
+    }
+
+    .preview-stage p {
+      color: #cdd6eb;
+      max-width: 460px;
+    }
+
+    .preview-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .preview-buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .preview-btn {
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.02);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+    }
+
+    .preview-btn.primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      border-color: transparent;
+      color: #fff;
+    }
+
+    .scrub-track {
+      position: relative;
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(148, 163, 184, 0.18);
+      overflow: hidden;
+      margin-top: 18px;
+    }
+
+    .scrub-fill,
+    .progress-fill {
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 46%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      border-radius: inherit;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .field label {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .field input,
+    .field textarea {
+      width: 100%;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.02);
+      color: var(--text);
+      padding: 12px 14px;
+      font: inherit;
+    }
+
+    .field textarea {
+      min-height: 110px;
+      resize: none;
+    }
+
+    .stack-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    .artifact-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 26px;
+    }
+
+    .artifact-name {
+      font-family: var(--font-mono);
+      color: var(--accent);
+      font-size: 0.86rem;
+      margin-bottom: 12px;
+    }
+
+    .artifact-body {
+      color: var(--text-muted);
+      font-size: 0.94rem;
+      line-height: 1.7;
+    }
+
+    .mini-stat {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-dim);
+    }
+
+    .progress-track {
+      position: relative;
+      height: 12px;
+      border-radius: 999px;
+      background: rgba(148, 163, 184, 0.16);
+      overflow: hidden;
+      margin-top: 18px;
+      margin-bottom: 10px;
+    }
+
+    .progress-fill {
+      width: 78%;
+    }
+
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--text-dim);
+    }
+
+    .code-body {
+      padding: 34px 38px;
+      overflow-x: auto;
+    }
+
+    pre {
+      margin: 0;
+    }
+
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.98rem;
+      line-height: 1.85;
+      display: block;
+      white-space: pre;
+    }
+
+    .syn-kw { color: #a78bfa; }
+    .syn-fn { color: #60a5fa; }
+    .syn-str { color: #4ade80; }
+    .syn-num { color: #fb923c; }
+    .syn-obj { color: var(--text); }
+    .syn-prop { color: #93c5fd; }
+    .syn-cmt { color: var(--text-dim); font-style: italic; }
+    .syn-punc { color: var(--text-dim); }
+    .syn-pkg { color: #34d399; }
+
+    #cta {
+      text-align: center;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .cta-shell {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .cta-shell .terminal-box {
+      margin-top: 28px;
+    }
+
+    footer {
+      padding: 36px 72px 56px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--border);
+      color: var(--text-dim);
+      font-size: 0.88rem;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+      list-style: none;
+    }
+
+    .footer-links a {
+      color: var(--text-dim);
+      text-decoration: none;
+    }
+
+    .footer-links a:hover {
+      color: var(--text-muted);
+    }
+
+    .footer-wordmark {
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-weight: 700;
+      margin-right: 8px;
+    }
+
+    @media (min-width: 1600px) and (max-height: 1120px) {
+      section {
+        padding: 96px 64px 48px;
+      }
+
+      nav {
+        padding: 16px 64px;
+      }
+
+      section::before {
+        left: 64px;
+        right: 64px;
+      }
+
+      .section-label {
+        margin-bottom: 12px;
+      }
+
+      .section-title {
+        font-size: 1.96rem;
+        margin-bottom: 8px;
+        max-width: 860px;
+      }
+
+      .section-subtitle {
+        font-size: 0.94rem;
+        margin-bottom: 20px;
+        max-width: 720px;
+      }
+
+      .steps-grid,
+      .features-grid {
+        gap: 12px;
+      }
+
+      .feature-card {
+        padding: 15px;
+        border-radius: 14px;
+      }
+
+      .feature-kicker {
+        margin-bottom: 6px;
+        font-size: 0.64rem;
+      }
+
+      .feature-name {
+        font-size: 1.12rem;
+        margin-bottom: 9px;
+      }
+
+      .feature-desc {
+        font-size: 0.88rem;
+        line-height: 1.5;
+      }
+
+      .feature-tag {
+        margin-top: 12px;
+        padding: 5px 8px;
+        font-size: 0.68rem;
+      }
+
+      .snippet {
+        margin-top: 12px;
+        padding: 12px 14px;
+        font-size: 0.72rem;
+        line-height: 1.65;
+      }
+
+      .preview-shell {
+        grid-template-columns: 250px 1fr 280px;
+      }
+
+      .preview-panel {
+        padding: 18px;
+      }
+
+      .preview-stage {
+        min-height: 300px;
+        padding: 20px;
+      }
+
+      .preview-stage h3 {
+        font-size: 1.7rem;
+      }
+
+      .preview-stage p {
+        font-size: 0.92rem;
+      }
+
+      .field {
+        margin-bottom: 12px;
+      }
+
+      .field textarea {
+        min-height: 88px;
+      }
+
+      .code-body {
+        padding: 24px 28px;
+      }
+
+      code {
+        font-size: 0.86rem;
+        line-height: 1.58;
+      }
+
+      #voiceover .features-grid.cols-3,
+      #export-stack .features-grid.cols-3,
+      #ops .features-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      #voiceover #voiceover-config,
+      #preview-editor #preview-command,
+      #export-stack #export-config,
+      #export-stack #export-progress {
+        margin-bottom: 14px !important;
+        margin-top: 14px !important;
+      }
+
+      #export-progress .progress-track {
+        margin-top: 12px;
+        margin-bottom: 8px;
+      }
+
+      #export-progress .pill-row {
+        gap: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="#hero" class="nav-logo">argo<span class="brand-slash">/</span></a>
+    <ul class="nav-links">
+      <li><a href="#authoring">Authoring</a></li>
+      <li><a href="#voiceover">Voice</a></li>
+      <li><a href="#preview-editor">Preview</a></li>
+      <li><a href="#export-stack">Export</a></li>
+      <li><a href="#code-example">Code</a></li>
+    </ul>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle light/dark theme">
+      <span class="icon-moon">&#9790;</span>
+      <span class="icon-sun">&#9788;</span>
+      <span>Theme</span>
+    </button>
+  </nav>
+
+  <section id="hero">
+    <div class="hero-shell">
+      <div>
+        <div class="hero-eyebrow">Playwright in. Launch assets out.</div>
+        <h1 class="hero-title">Argo<span class="brand-slash">/</span></h1>
+        <p class="hero-copy">
+          Argo turns <strong>Playwright demos</strong> into polished product videos, with voiceover,
+          camera direction, preview editing, and export in one system.
+        </p>
+        <div class="hero-badges">
+          <span class="hero-badge">unified scenes manifest</span>
+          <span class="hero-badge">preview editor</span>
+          <span class="hero-badge">7 TTS engines + voice clone</span>
+          <span class="hero-badge">camera effects + multi-format export</span>
+        </div>
+        <a href="#authoring" class="hero-cta">See the full stack</a>
+      </div>
+
+      <div class="terminal-box" id="hero-command">
+        <div class="terminal-bar">
+          <span class="dot red"></span>
+          <span class="dot yellow"></span>
+          <span class="dot green"></span>
+          <span class="bar-label">terminal</span>
+        </div>
+        <div class="terminal-body">
+          <div class="terminal-line">
+            <span class="terminal-prompt">$</span>
+            <span><span class="cmd-name">npx</span> <span class="cmd-sub">argo</span> <span class="cmd-sub">pipeline</span> <span class="cmd-arg">showcase</span></span>
+          </div>
+          <div class="terminal-meta">
+            <div class="meta-card">
+              <div class="meta-label">Outputs</div>
+              <div class="meta-value">MP4 + subtitles + chapters + scene report</div>
+            </div>
+            <div class="meta-card">
+              <div class="meta-label">Built in</div>
+              <div class="meta-value">Preview editing, subtitles, chapters, and multi-format export</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="authoring">
+    <div class="section-inner">
+      <p class="section-label">Authoring</p>
+      <h2 class="section-title">Stay in Playwright. Add just enough video language.</h2>
+      <p class="section-subtitle">
+        Start from scratch or convert an existing test. Keep scene names stable as the product evolves.
+      </p>
+
+      <div class="steps-grid">
+        <div class="feature-card" id="step-init" data-demo-target="step-init">
+          <div class="feature-kicker">01</div>
+          <h3 class="feature-name"><span class="inline-code">argo init</span> scaffolds the path</h3>
+          <p class="feature-desc">Config, demo script, and manifest in one pass.</p>
+          <span class="feature-tag">npx argo init</span>
+        </div>
+        <div class="feature-card" id="step-from" data-demo-target="step-from">
+          <div class="feature-kicker">02</div>
+          <h3 class="feature-name"><span class="inline-code">init --from</span> converts tests</h3>
+          <p class="feature-desc">Convert an existing spec — keep selectors, add narration.</p>
+          <span class="feature-tag">npx argo init --from tests/checkout.spec.ts</span>
+        </div>
+        <div class="feature-card" id="step-pipeline" data-demo-target="step-pipeline">
+          <div class="feature-kicker">03</div>
+          <h3 class="feature-name">One pipeline, many artifacts</h3>
+          <p class="feature-desc">TTS, recording, alignment, subtitles, chapters, and export in one command.</p>
+          <span class="feature-tag">argo pipeline showcase</span>
+        </div>
+        <div class="feature-card" id="step-import" data-demo-target="step-import">
+          <div class="feature-kicker">04</div>
+          <h3 class="feature-name"><span class="inline-code">argo import</span> any recording</h3>
+          <p class="feature-desc">Import a screen recording, add scenes in preview, export with voiceover and overlays.</p>
+          <span class="feature-tag">argo import recording.mp4</span>
+        </div>
+      </div>
+
+      <div class="features-grid" style="grid-template-columns: repeat(4, minmax(0, 1fr));">
+        <div class="feature-card" id="authoring-manifest" data-demo-target="authoring-manifest">
+          <div class="feature-kicker">Unified Manifest</div>
+          <h3 class="feature-name">One <span class="inline-code">.scenes.json</span> file</h3>
+          <p class="feature-desc">Voiceover, voice, speed, and overlays in one file per scene.</p>
+          <span class="feature-tag">.scenes.json</span>
+        </div>
+
+        <div class="feature-card" id="authoring-overlays" data-demo-target="authoring-overlays">
+          <div class="feature-kicker">Overlays</div>
+          <h3 class="feature-name">Headline cards, callouts, lower-thirds, image cards</h3>
+          <p class="feature-desc">Typed overlays keep the story visible without baking text into the app.</p>
+          <span class="feature-tag">showOverlay() / withOverlay()</span>
+        </div>
+
+        <div class="feature-card" id="authoring-silent" data-demo-target="authoring-silent">
+          <div class="feature-kicker">Silent Mode</div>
+          <h3 class="feature-name">Omit <span class="inline-code">text</span> when you just want motion</h3>
+          <p class="feature-desc">Silent scenes and fully silent videos export cleanly with the same structure.</p>
+          <span class="feature-tag">text: omitted</span>
+        </div>
+
+        <div class="feature-card" id="authoring-duration" data-demo-target="authoring-duration">
+          <div class="feature-kicker">Timing Helpers</div>
+          <h3 class="feature-name">Scene pacing from clip lengths</h3>
+          <p class="feature-desc"><span class="inline-code">durationFor()</span> syncs scene holds to TTS clip lengths automatically.</p>
+          <span class="feature-tag">narration.durationFor('preview')</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="voiceover">
+    <div class="section-inner">
+      <p class="section-label">Voiceover</p>
+      <h2 class="section-title">Seven engines. Local first. Voice clone when it matters.</h2>
+      <p class="section-subtitle">
+        Iterate with local TTS, switch to a premium engine for the final cut, or clone your own voice for branded walkthroughs.
+        Scene-level voice, speed, and language are part of the same manifest.
+      </p>
+
+      <div class="feature-card" id="voiceover-config" data-demo-target="voiceover-config" style="margin-bottom: 20px;">
+        <div class="feature-kicker">Config</div>
+        <h3 class="feature-name">Swap engines with one line</h3>
+        <div class="snippet">
+          <span class="k">tts</span><span class="p">:</span> <span class="p">{</span><br />
+          &nbsp;&nbsp;<span class="n">engine</span><span class="p">:</span> <span class="n">engines</span><span class="p">.</span><span class="n">mlxAudio</span><span class="p">({</span> <span class="n">refAudio</span><span class="p">:</span> <span class="s">'./my-voice.wav'</span> <span class="p">}),</span><br />
+          &nbsp;&nbsp;<span class="n">defaultVoice</span><span class="p">:</span> <span class="s">'af_heart'</span><span class="p">,</span><br />
+          &nbsp;&nbsp;<span class="n">defaultSpeed</span><span class="p">:</span> <span class="n">0.95</span><br />
+          <span class="p">}</span>
+        </div>
+      </div>
+
+      <div class="features-grid cols-3">
+        <div class="feature-card" id="engine-kokoro" data-demo-target="engine-kokoro">
+          <div class="feature-kicker">Local default</div>
+          <h3 class="feature-name">Kokoro</h3>
+          <p class="feature-desc">Zero API keys, fast iteration, stable local-first workflow.</p>
+          <span class="feature-tag">engines.kokoro()</span>
+        </div>
+        <div class="feature-card" id="engine-transformers" data-demo-target="engine-transformers">
+          <div class="feature-kicker">Hugging Face</div>
+          <h3 class="feature-name">Transformers.js</h3>
+          <p class="feature-desc">Bring your own browser- or Node-friendly model for custom voices and local experimentation.</p>
+          <span class="feature-tag">engines.transformers()</span>
+        </div>
+        <div class="feature-card" id="engine-mlx" data-demo-target="engine-mlx">
+          <div class="feature-kicker">Voice clone</div>
+          <h3 class="feature-name">mlx-audio</h3>
+          <p class="feature-desc">Use a short reference recording when the demo should sound like a real team member instead of a stock voice.</p>
+          <span class="feature-tag">refAudio: './my-voice.wav'</span>
+        </div>
+        <div class="feature-card" id="engine-openai" data-demo-target="engine-openai">
+          <div class="feature-kicker">Cloud</div>
+          <h3 class="feature-name">OpenAI</h3>
+          <p class="feature-desc">High-quality hosted voices for polished final narration.</p>
+          <span class="feature-tag">engines.openai()</span>
+        </div>
+        <div class="feature-card" id="engine-elevenlabs" data-demo-target="engine-elevenlabs">
+          <div class="feature-kicker">Cloud</div>
+          <h3 class="feature-name">ElevenLabs</h3>
+          <p class="feature-desc">Realistic hosted voice output with richer timbre control.</p>
+          <span class="feature-tag">engines.elevenlabs()</span>
+        </div>
+        <div class="feature-card" id="engine-gemini" data-demo-target="engine-gemini">
+          <div class="feature-kicker">Cloud</div>
+          <h3 class="feature-name">Gemini</h3>
+          <p class="feature-desc">Google-hosted multilingual voice output when the showcase needs broader language coverage.</p>
+          <span class="feature-tag">engines.gemini()</span>
+        </div>
+        <div class="feature-card" id="engine-sarvam" data-demo-target="engine-sarvam">
+          <div class="feature-kicker">Regional</div>
+          <h3 class="feature-name">Sarvam</h3>
+          <p class="feature-desc">Indian language narration for localized product demos and launch materials.</p>
+          <span class="feature-tag">engines.sarvam()</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="preview-editor">
+    <div class="section-inner">
+      <p class="section-label">Preview</p>
+      <h2 class="section-title">Edit the final cut without throwing away the recording.</h2>
+      <p class="section-subtitle">
+        Scrub by scene, regenerate one line, export again.
+      </p>
+
+      <div class="features-grid" style="margin-bottom: 20px;">
+        <div class="feature-card" id="preview-command" data-demo-target="preview-command">
+          <div class="feature-kicker">Editor</div>
+          <h3 class="feature-name">The same showcase becomes the edit bay</h3>
+          <span class="feature-tag">npx argo preview showcase</span>
+        </div>
+        <div class="feature-card" id="preview-drag" data-demo-target="preview-drag">
+          <div class="feature-kicker">Drag-to-Snap</div>
+          <h3 class="feature-name">Position overlays by dragging</h3>
+          <p class="feature-desc">Drag overlays on the video to snap to 6 zones. Visual, immediate, no config editing.</p>
+        </div>
+      </div>
+
+      <div class="preview-shell" id="preview-shell" data-demo-target="preview-shell">
+        <div class="preview-panel" id="preview-scene-list">
+          <div class="feature-kicker">Scenes</div>
+          <div class="preview-scene active">
+            <strong>preview</strong>
+            <span>Edit line, regenerate narration, scrub the scene.</span>
+          </div>
+          <div class="preview-scene">
+            <strong>camera</strong>
+            <span>Check timing after spotlight and zoom.</span>
+          </div>
+          <div class="preview-scene">
+            <strong>export</strong>
+            <span>Confirm transitions, watermark, freeze frame, and output feel right.</span>
+          </div>
+          <div class="preview-chip-row" style="margin-top: 12px;">
+            <span class="preview-chip" id="preview-regen">regen line</span>
+            <span class="preview-chip">preview scene</span>
+            <span class="preview-chip">+250ms</span>
+          </div>
+        </div>
+
+        <div class="preview-panel">
+          <div class="preview-stage">
+            <div class="feature-kicker">Video + aligned audio</div>
+            <h3>Scrub by scene. Keep the cut. Change the line.</h3>
+            <p>Preview keeps the recorded browser pass and lets you iterate on narration, overlays, timing, and export decisions.</p>
+          </div>
+          <div class="scrub-track" id="preview-scrubber">
+            <div class="scrub-fill"></div>
+          </div>
+          <div class="preview-toolbar">
+            <span class="preview-chip">scene 04 / 10</span>
+            <div class="preview-buttons">
+              <button class="preview-btn" id="preview-rerecord">Re-record</button>
+              <button class="preview-btn primary" id="preview-export">Export</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="preview-panel">
+          <div class="field">
+            <label for="preview-text-field">Narration Text</label>
+            <textarea id="preview-text-field" placeholder="Type a revision here..."></textarea>
+          </div>
+          <div class="field">
+            <label>Voice</label>
+            <input value="af_heart" readonly />
+          </div>
+          <div class="field">
+            <label>Overlay</label>
+            <input value="headline-card / top-right / autoBackground" readonly />
+          </div>
+          <div class="pill-row">
+            <span class="pill">scene scrub</span>
+            <span class="pill">single-line regen</span>
+            <span class="pill">save manifest</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="camera-effects">
+    <div class="section-inner">
+      <p class="section-label">Camera Language</p>
+      <h2 class="section-title">Direct attention like an editor, not a screen recorder.</h2>
+      <p class="section-subtitle">
+        Every feature gets a focused beat instead of scroll-and-pray.
+      </p>
+
+      <div class="features-grid cols-3">
+        <div class="feature-card" id="effect-spotlight" data-demo-target="effect-spotlight">
+          <div class="feature-kicker">Effect</div>
+          <h3 class="feature-name"><span class="inline-code">spotlight()</span></h3>
+          <p class="feature-desc">Darken everything except the thing you need the viewer to understand first.</p>
+        </div>
+        <div class="feature-card" id="effect-focus-ring" data-demo-target="effect-focus-ring">
+          <div class="feature-kicker">Effect</div>
+          <h3 class="feature-name"><span class="inline-code">focusRing()</span></h3>
+          <p class="feature-desc">Use a pulse instead of a full dim when you want a lighter touch.</p>
+        </div>
+        <div class="feature-card" id="effect-dim-around" data-demo-target="effect-dim-around">
+          <div class="feature-kicker">Effect</div>
+          <h3 class="feature-name"><span class="inline-code">dimAround()</span></h3>
+          <p class="feature-desc">Fade siblings away so the one changed card or command becomes obvious.</p>
+        </div>
+        <div class="feature-card" id="effect-confetti" data-demo-target="effect-confetti">
+          <div class="feature-kicker">Effect</div>
+          <h3 class="feature-name"><span class="inline-code">showConfetti()</span></h3>
+          <p class="feature-desc">Use sparingly for launches, wins, or the last scene of the showcase.</p>
+        </div>
+        <div class="feature-card" id="effect-cursor" data-demo-target="effect-cursor">
+          <div class="feature-kicker">Effect</div>
+          <h3 class="feature-name"><span class="inline-code">cursorHighlight()</span></h3>
+          <p class="feature-desc">Keep the eye on the pointer during dense walkthroughs without painting giant arrows on screen.</p>
+        </div>
+        <div class="feature-card" id="effect-zoom" data-demo-target="effect-zoom">
+          <div class="feature-kicker">Post-Export</div>
+          <h3 class="feature-name"><span class="inline-code">zoomTo()</span></h3>
+          <p class="feature-desc">Push into any element with ffmpeg zoompan — frame-exact, overlay-safe, no DOM hacks.</p>
+        </div>
+        <div class="feature-card" id="effect-motion-blur" data-demo-target="effect-motion-blur">
+          <div class="feature-kicker">Post-Export</div>
+          <h3 class="feature-name"><span class="inline-code">motionBlur</span></h3>
+          <p class="feature-desc">Camera zooms and pans get natural motion blur via tblend — adjustable intensity from subtle to cinematic.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="export-stack">
+    <div class="section-inner">
+      <p class="section-label">Export Stack</p>
+      <h2 class="section-title">Argo export is more than just a video export.</h2>
+      <p class="section-subtitle">
+        This is where the finishing happens. Transitions, background music, watermarking, freeze-frame holds, subtitles, chapters, reports, and social formats all come from the same timeline.
+      </p>
+
+      <div class="feature-card" id="export-config" data-demo-target="export-config" style="margin-bottom: 20px;">
+        <div class="feature-kicker">Config</div>
+        <div class="snippet">
+          <span class="k">export</span><span class="p">:</span> <span class="p">{</span><br />
+          &nbsp;&nbsp;<span class="n">transition</span><span class="p">:</span> <span class="p">{</span> <span class="n">type</span><span class="p">:</span> <span class="s">'fade-through-black'</span><span class="p">,</span> <span class="n">durationMs</span><span class="p">:</span> <span class="n">2000</span> <span class="p">},</span><br />
+          &nbsp;&nbsp;<span class="n">audio</span><span class="p">:</span> <span class="p">{</span> <span class="n">music</span><span class="p">:</span> <span class="s">'assets/bg-music.mp3'</span><span class="p">,</span> <span class="n">musicVolume</span><span class="p">:</span> <span class="n">0.15</span> <span class="p">},</span><br />
+          &nbsp;&nbsp;<span class="n">watermark</span><span class="p">:</span> <span class="p">{</span> <span class="n">src</span><span class="p">:</span> <span class="s">'assets/logo-watermark.png'</span><span class="p">,</span> <span class="n">opacity</span><span class="p">:</span> <span class="n">0.16</span> <span class="p">},</span><br />
+          &nbsp;&nbsp;<span class="n">formats</span><span class="p">:</span> <span class="p">[</span><span class="s">'gif'</span><span class="p">,</span> <span class="s">'1:1'</span><span class="p">,</span> <span class="s">'9:16'</span><span class="p">]</span><br />
+          <span class="p">}</span>
+        </div>
+      </div>
+
+      <div class="features-grid cols-3">
+        <div class="feature-card" id="export-transitions" data-demo-target="export-transitions">
+          <div class="feature-kicker">Transitions</div>
+          <h3 class="feature-name">fade-through-black, dissolve, wipes</h3>
+          <p class="feature-desc">Scene boundaries read like editorial choices instead of hard test cuts.</p>
+        </div>
+        <div class="feature-card" id="export-audio" data-demo-target="export-audio">
+          <div class="feature-kicker">Audio</div>
+          <h3 class="feature-name">Narration plus a music bed</h3>
+          <p class="feature-desc">Layer a low background track under voiceover, loop it to fill the cut, and normalize the final mix.</p>
+        </div>
+        <div class="feature-card" id="export-musicgen" data-demo-target="export-musicgen">
+          <div class="feature-kicker">AI Music</div>
+          <h3 class="feature-name">Generate BGM from a prompt</h3>
+          <p class="feature-desc">Type a prompt in preview, MusicGen generates a track in-browser via WebGPU. No API keys.</p>
+        </div>
+        <div class="feature-card" id="export-watermark" data-demo-target="export-watermark">
+          <div class="feature-kicker">Watermark</div>
+          <h3 class="feature-name">Brand every export</h3>
+          <p class="feature-desc">Stamp a subtle PNG logo into any corner without touching the product UI or the recording script.</p>
+        </div>
+        <div class="feature-card" id="export-freeze" data-demo-target="export-freeze">
+          <div class="feature-kicker">Freeze frame</div>
+          <h3 class="feature-name">Hold the hero moment</h3>
+          <p class="feature-desc">Insert a deliberate frame hold from the manifest when a launch beat or CTA deserves extra weight.</p>
+        </div>
+        <div class="feature-card" id="export-metadata" data-demo-target="export-metadata">
+          <div class="feature-kicker">Delivery metadata</div>
+          <h3 class="feature-name">Subtitles, chapters, scene report</h3>
+          <p class="feature-desc">SRT, VTT subtitles, embedded chapters, and a scene report after every run.</p>
+        </div>
+        <div class="feature-card" id="export-formats" data-demo-target="export-formats">
+          <div class="feature-kicker">Formats</div>
+          <h3 class="feature-name"><span class="inline-code">16:9</span>, <span class="inline-code">1:1</span>, <span class="inline-code">9:16</span>, <span class="inline-code">GIF</span></h3>
+          <p class="feature-desc">One recording serves homepage, docs, and social channels.</p>
+        </div>
+        <div class="feature-card" id="export-mobile" data-demo-target="export-mobile">
+          <div class="feature-kicker">Viewport-native</div>
+          <h3 class="feature-name">Square and vertical rerenders</h3>
+          <p class="feature-desc">Re-record at 1:1 or 9:16 viewports instead of blur-filling the sides.</p>
+        </div>
+      </div>
+
+      <div class="feature-card" id="export-progress" data-demo-target="export-progress" style="margin-top: 20px;">
+        <div class="feature-kicker">Progress</div>
+        <h3 class="feature-name">You can see export progress while ffmpeg runs</h3>
+        <div class="progress-track">
+          <div class="progress-fill"></div>
+        </div>
+        <div class="progress-meta">
+          <span>encoding 78%</span>
+          <span>showcase.mp4</span>
+        </div>
+        <div class="pill-row" style="margin-top: 18px;">
+          <span class="pill">music bed</span>
+          <span class="pill">watermark</span>
+          <span class="pill">freeze frame</span>
+          <span class="pill">subtitles</span>
+          <span class="pill">chapters</span>
+          <span class="pill">multi-format</span>
+          <span class="pill">progress bar</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ Studio Polish ═══ -->
+  <section id="studio-polish">
+    <div class="section-inner">
+      <p class="section-label">Studio Polish</p>
+      <h2 class="section-title">Ship videos that look like Screen Studio, not screen recordings.</h2>
+      <p class="section-subtitle">
+        Frame your recording with padding, rounded corners, and a drop shadow on any background.
+        Add motion blur to camera moves, control per-scene playback speed, and point viewers to what matters with arrow annotations.
+      </p>
+
+      <div class="feature-card" id="frame-config" data-demo-target="frame-config" style="margin-bottom: 20px;">
+        <div class="feature-kicker">Config</div>
+        <div class="snippet">
+          <span class="k">export</span><span class="p">:</span> <span class="p">{</span><br />
+          &nbsp;&nbsp;<span class="n">frame</span><span class="p">:</span> <span class="p">{</span><br />
+          &nbsp;&nbsp;&nbsp;&nbsp;<span class="n">padding</span><span class="p">:</span> <span class="n">48</span><span class="p">,</span>
+          <span class="n">borderRadius</span><span class="p">:</span> <span class="n">16</span><span class="p">,</span>
+          <span class="n">shadow</span><span class="p">:</span> <span class="n">0.6</span><span class="p">,</span><br />
+          &nbsp;&nbsp;&nbsp;&nbsp;<span class="n">background</span><span class="p">:</span> <span class="p">{</span> <span class="n">type</span><span class="p">:</span> <span class="s">'gradient'</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="s">'linear-gradient(135deg, #667eea, #764ba2)'</span> <span class="p">}</span><br />
+          &nbsp;&nbsp;<span class="p">},</span><br />
+          &nbsp;&nbsp;<span class="n">motionBlur</span><span class="p">:</span> <span class="p">{</span> <span class="n">intensity</span><span class="p">:</span> <span class="n">0.4</span> <span class="p">}</span><br />
+          <span class="p">}</span>
+        </div>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-card" id="polish-frame" data-demo-target="polish-frame">
+          <div class="feature-kicker">Frame + Background</div>
+          <h3 class="feature-name">Padding, rounded corners, drop shadow</h3>
+          <p class="feature-desc">Wrap the raw recording in a styled frame with solid colors, CSS gradients, or custom images behind it. One config block, no Photoshop.</p>
+        </div>
+        <div class="feature-card" id="polish-motion-blur" data-demo-target="polish-motion-blur">
+          <div class="feature-kicker">Motion Blur</div>
+          <h3 class="feature-name">Smooth zoom and pan transitions</h3>
+          <p class="feature-desc">Camera moves get natural motion blur applied after the zoompan filter. Adjustable intensity from subtle to cinematic.</p>
+        </div>
+        <div class="feature-card" id="polish-scene-speed" data-demo-target="polish-scene-speed">
+          <div class="feature-kicker">Per-Scene Speed</div>
+          <h3 class="feature-name">Slow-mo reveals, fast-forward intros</h3>
+          <p class="feature-desc">Set <code>playbackSpeed: 0.5</code> on a scene to linger on the hero moment or <code>2.0</code> to skip the setup. Works alongside gap speed ramp.</p>
+        </div>
+        <div class="feature-card" id="polish-arrows" data-demo-target="polish-arrows">
+          <div class="feature-kicker">Arrow Annotations</div>
+          <h3 class="feature-name">Point viewers to what matters</h3>
+          <p class="feature-desc">Eight directions, customizable color and size, optional label. SVG-based arrows render in any overlay zone with full theme support.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="ops">
+    <div class="section-inner">
+      <p class="section-label">Fleet Workflow</p>
+      <h2 class="section-title">When you have more than one demo, Argo scales with you.</h2>
+      <p class="section-subtitle">
+        The same tools that make a single showcase strong also help when the product has multiple journeys, environments, and owners.
+      </p>
+
+      <div class="features-grid">
+        <div class="feature-card" id="ops-batch" data-demo-target="ops-batch">
+          <div class="feature-kicker">Batch</div>
+          <h3 class="feature-name"><span class="inline-code">argo pipeline --all</span></h3>
+          <p class="feature-desc">Run every demo and fail the batch when any path breaks.</p>
+        </div>
+        <div class="feature-card" id="ops-dashboard" data-demo-target="ops-dashboard">
+          <div class="feature-kicker">Dashboard</div>
+          <h3 class="feature-name">Preview every demo from one view</h3>
+          <p class="feature-desc">Status, resolution, quick preview links, and a clearer picture of what needs rerendering.</p>
+        </div>
+        <div class="feature-card" id="ops-validate" data-demo-target="ops-validate">
+          <div class="feature-kicker">Validation</div>
+          <h3 class="feature-name">Catch bad scene wiring before a render</h3>
+          <p class="feature-desc">Check scene names and manifest structure before spending time on a render.</p>
+        </div>
+        <div class="feature-card" id="ops-doctor" data-demo-target="ops-doctor">
+          <div class="feature-kicker">Doctor</div>
+          <h3 class="feature-name">Check the environment</h3>
+          <p class="feature-desc">ffmpeg, Playwright browsers, config — catch failures before they burn time.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="code-example">
+    <div class="section-inner">
+      <p class="section-label">Code</p>
+      <h2 class="section-title">It is still just a Playwright script.</h2>
+      <p class="section-subtitle">
+        That is the real wedge. The video stays maintainable because the demo logic is still code your team already understands.
+      </p>
+
+      <div class="code-wrap" id="demo-script-card" data-demo-target="demo-script-card">
+        <div class="code-bar">
+          <span class="dot red"></span>
+          <span class="dot yellow"></span>
+          <span class="dot green"></span>
+          <span class="bar-label">demos/launch-day.demo.ts</span>
+        </div>
+        <div class="code-body">
+<pre id="demo-script-code"><code><span class="syn-comment">// That's it. That's the whole demo.</span>
+<span class="syn-kw">import</span> <span class="syn-punc">{ </span><span class="syn-obj">test</span><span class="syn-punc"> }</span> <span class="syn-kw">from</span> <span class="syn-str">'<span class="syn-pkg">@argo-video/cli</span>'</span><span class="syn-punc">;</span>
+<span class="syn-kw">import</span> <span class="syn-punc">{ </span><span class="syn-obj">showOverlay</span><span class="syn-punc">, </span><span class="syn-obj">spotlight</span><span class="syn-punc">, </span><span class="syn-obj">showConfetti</span><span class="syn-punc"> }</span> <span class="syn-kw">from</span> <span class="syn-str">'<span class="syn-pkg">@argo-video/cli</span>'</span><span class="syn-punc">;</span>
+<span class="syn-kw">import</span> <span class="syn-punc">{ </span><span class="syn-obj">cursorHighlight</span> <span class="syn-punc">}</span> <span class="syn-kw">from</span> <span class="syn-str">'<span class="syn-pkg">@argo-video/cli</span>'</span><span class="syn-punc">;</span>
+
+<span class="syn-fn">test</span><span class="syn-punc">(</span><span class="syn-str">'launch-day'</span><span class="syn-punc">, </span><span class="syn-kw">async</span> <span class="syn-punc">({ </span><span class="syn-obj">page</span><span class="syn-punc">, </span><span class="syn-obj">narration</span><span class="syn-punc"> }) =&gt; {</span>
+  <span class="syn-kw">await</span> <span class="syn-obj">page</span><span class="syn-punc">.</span><span class="syn-fn">goto</span><span class="syn-punc">(</span><span class="syn-str">'/'</span><span class="syn-punc">);</span>
+  <span class="syn-fn">cursorHighlight</span><span class="syn-punc">(</span><span class="syn-obj">page</span><span class="syn-punc">);</span>
+
+  <span class="syn-obj">narration</span><span class="syn-punc">.</span><span class="syn-fn">mark</span><span class="syn-punc">(</span><span class="syn-str">'hero'</span><span class="syn-punc">);</span>
+  <span class="syn-fn">spotlight</span><span class="syn-punc">(</span><span class="syn-obj">page</span><span class="syn-punc">, </span><span class="syn-str">'#launch-cta'</span><span class="syn-punc">, { </span><span class="syn-prop">duration</span><span class="syn-punc">: </span><span class="syn-num">3000</span> <span class="syn-punc">});</span>
+  <span class="syn-kw">await</span> <span class="syn-fn">showOverlay</span><span class="syn-punc">(</span><span class="syn-obj">page</span><span class="syn-punc">, </span><span class="syn-str">'hero'</span><span class="syn-punc">, </span><span class="syn-obj">narration</span><span class="syn-punc">.</span><span class="syn-fn">durationFor</span><span class="syn-punc">(</span><span class="syn-str">'hero'</span><span class="syn-punc">));</span>
+
+  <span class="syn-obj">narration</span><span class="syn-punc">.</span><span class="syn-fn">mark</span><span class="syn-punc">(</span><span class="syn-str">'liftoff'</span><span class="syn-punc">);</span>
+  <span class="syn-fn">showConfetti</span><span class="syn-punc">(</span><span class="syn-obj">page</span><span class="syn-punc">, { </span><span class="syn-prop">emoji</span><span class="syn-punc">: [</span><span class="syn-str">'🚀'</span><span class="syn-punc">, </span><span class="syn-str">'✨'</span><span class="syn-punc">, </span><span class="syn-str">'🎬'</span><span class="syn-punc">] });</span>
+<span class="syn-punc">});</span></code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="cta">
+    <div class="cta-shell">
+      <p class="section-label">Get Started</p>
+      <h2 class="section-title">Demos as code. Ship them like software.</h2>
+      <p class="section-subtitle" style="margin-left: auto; margin-right: auto;">
+        Write once, record once, export everywhere. Your demo stays current as your product evolves.
+      </p>
+      <div class="terminal-box" id="get-started-command">
+        <div class="terminal-bar">
+          <span class="dot red"></span>
+          <span class="dot yellow"></span>
+          <span class="dot green"></span>
+          <span class="bar-label">get started</span>
+        </div>
+        <div class="terminal-body">
+          <div class="terminal-line">
+            <span class="terminal-prompt">$</span>
+            <span><span class="cmd-name">npm</span> <span class="cmd-sub">i</span> <span class="cmd-sub">-D</span> <span class="cmd-arg">@argo-video/cli</span> <span class="cmd-sub">&amp;&amp;</span> <span class="cmd-name">npx</span> <span class="cmd-sub">argo</span> <span class="cmd-sub">init</span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span><span class="footer-wordmark">argo<span class="brand-slash">/</span></span>Recorded by Argo. Directed by code.</span>
+    <ul class="footer-links">
+      <li><a href="#authoring">Authoring</a></li>
+      <li><a href="#preview-editor">Preview</a></li>
+      <li><a href="#export-stack">Export</a></li>
+      <li><a href="#code-example">Code</a></li>
+    </ul>
+  </footer>
+
+  <script>
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+      document.documentElement.classList.toggle('light');
+    });
+  </script>
+</body>
+</html>

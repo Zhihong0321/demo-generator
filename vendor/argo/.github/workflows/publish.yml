@@ -1,0 +1,38 @@
+name: Publish to npm
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+      # Prevent apt-get / playwright --with-deps stalling on a prompt.
+      DEBIAN_FRONTEND: noninteractive
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+
+      # ffmpeg is a runtime dependency for Argo's tests (boundary frame
+      # extraction, shader pre-render). Ubuntu runners don't ship it.
+      - run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - run: npm install
+
+      - run: npx playwright install --with-deps chromium
+
+      - run: npm run build
+
+      - run: npm test
+
+      - run: npm publish --provenance --access public

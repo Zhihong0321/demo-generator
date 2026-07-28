@@ -1,0 +1,67 @@
+/*
+ * App Contract #1 — demo mode presentation overrides.
+ *
+ * Serve this as a SEPARATE file and inject it lazily, only when the demo flag
+ * is present. Do not bundle it into your main stylesheet: normal users should
+ * download zero extra bytes.
+ *
+ * Presentation only. Nothing here may change what the app computes.
+ */
+
+/* ---------------------------------------------------------------------------
+ * Kill all motion.
+ *
+ * This is the single highest-value rule in the file. Infinite animations
+ * (spinners, pulses, shimmer, breathing dots) never settle, so any
+ * "wait until the page is quiet" heuristic either hangs forever or captures a
+ * frame mid-spin. One global override handles every one of them without
+ * touching the per-component styles that define them.
+ * ------------------------------------------------------------------------ */
+*,
+*::before,
+*::after {
+  animation: none !important;
+  animation-duration: 0s !important;
+  animation-iteration-count: 1 !important;
+  transition: none !important;
+  transition-duration: 0s !important;
+  scroll-behavior: auto !important;
+  caret-color: transparent !important;
+}
+
+/* ---------------------------------------------------------------------------
+ * Hide chrome that has no place in a tutorial.
+ * Add your app's own selectors here — this list is a starting point.
+ * ------------------------------------------------------------------------ */
+[data-demo-hide],
+.cookie-banner,
+.consent-banner,
+.toast,
+.toast-container,
+.notification-badge,
+.intercom-lightweight-app,
+#intercom-container,
+.crisp-client,
+.beacon-container {
+  display: none !important;
+}
+
+/* ---------------------------------------------------------------------------
+ * Skeletons: show them as flat blocks rather than moving gradients, so a
+ * screen caught mid-load still reads as a still image.
+ * ------------------------------------------------------------------------ */
+.skeleton,
+[data-skeleton],
+.shimmer {
+  background-image: none !important;
+  opacity: 0.35 !important;
+}
+
+/* Scrollbars vary by OS and make renders non-reproducible across machines. */
+::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+}
+html {
+  scrollbar-width: none !important;
+}

@@ -1,0 +1,20 @@
+# Generated renders — large binaries, reproducible from the demo definitions.
+# The layout contract itself is tracked.
+renders/**
+!renders/NAMING.md
+
+# Build + install artifacts inside the vendored engine.
+vendor/argo/node_modules/
+vendor/argo/dist/
+vendor/argo/videos/
+vendor/argo/.argo/
+vendor/argo/test-results/
+vendor/argo/playwright-report/
+
+# Local fixtures and scratch
+fixtures/
+*.log
+
+# Never commit credentials.
+.env
+.env.*

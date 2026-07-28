@@ -1,0 +1,13 @@
+{
+  "id": "data-chart",
+  "version": "1.0.0",
+  "description": "Compact animated bar/line chart — for metrics, growth, and data-driven demo moments.",
+  "tags": ["data", "metrics"],
+  "props": {
+    "type": { "type": "string", "enum": ["bar", "line"], "required": true },
+    "title": { "type": "string", "required": true },
+    "values": { "type": "number[]", "required": true },
+    "labels": { "type": "string[]", "required": false },
+    "accentColor": { "type": "string", "required": false, "default": "#22c55e" }
+  }
+}

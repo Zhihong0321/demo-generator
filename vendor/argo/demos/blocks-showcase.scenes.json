@@ -1,0 +1,108 @@
+[
+  {
+    "scene": "intro",
+    "text": "Argo now ships five ready-to-use overlay blocks. Social posts, notifications, speaker lower thirds, data charts, and now-playing cards — all styled for product demos.",
+    "overlay": {
+      "type": "headline-card",
+      "kicker": "BLOCKS",
+      "title": "Five ready-to-use overlays",
+      "body": "Drop them into any scene via .scenes.json",
+      "placement": "center",
+      "motion": "fade-in",
+      "autoBackground": true
+    }
+  },
+  {
+    "scene": "x-post",
+    "text": "Show a social proof post for narrative moments.",
+    "overlay": {
+      "type": "block",
+      "block": "x-post",
+      "props": {
+        "handle": "@argo_team",
+        "name": "Argo",
+        "body": "v1 block registry just dropped — five demo-ready overlays bundled in.",
+        "timestamp": "2m",
+        "verified": true
+      },
+      "placement": "top-right",
+      "motion": "slide-in"
+    }
+  },
+  {
+    "scene": "macos",
+    "text": "Simulate in-app events like new signups.",
+    "overlay": {
+      "type": "block",
+      "block": "macos-notification",
+      "props": {
+        "appName": "Argo",
+        "title": "New signup",
+        "body": "jane@example.com just joined your team",
+        "timestamp": "now"
+      },
+      "placement": "top-right",
+      "motion": "slide-in"
+    }
+  },
+  {
+    "scene": "ytlt",
+    "text": "Introduce speakers with pro lower-third styling.",
+    "overlay": {
+      "type": "block",
+      "block": "yt-lower-third",
+      "props": {
+        "name": "Jane Doe",
+        "subtitle": "Engineering Lead",
+        "accentColor": "#ef4444"
+      },
+      "placement": "bottom-left",
+      "motion": "slide-in"
+    }
+  },
+  {
+    "scene": "chart",
+    "text": "Show growth metrics animated right in-frame.",
+    "overlay": {
+      "type": "block",
+      "block": "data-chart",
+      "props": {
+        "type": "bar",
+        "title": "Signups last 5 days",
+        "values": [12, 18, 34, 52, 87],
+        "labels": ["Mon", "Tue", "Wed", "Thu", "Fri"],
+        "accentColor": "#22c55e"
+      },
+      "placement": "bottom-right",
+      "motion": "fade-in"
+    }
+  },
+  {
+    "scene": "spotify",
+    "text": "Decorative cards work great as scene punctuation.",
+    "overlay": {
+      "type": "block",
+      "block": "spotify-card",
+      "props": {
+        "track": "Bohemian Rhapsody",
+        "artist": "Queen",
+        "elapsed": 120,
+        "total": 354
+      },
+      "placement": "bottom-center",
+      "motion": "fade-in"
+    }
+  },
+  {
+    "scene": "closing",
+    "text": "Five blocks today, more on the way. And the format is designed for a future argo add command.",
+    "overlay": {
+      "type": "headline-card",
+      "title": "More blocks coming →",
+      "body": "Argo v0.30",
+      "placement": "center",
+      "motion": "fade-in",
+      "autoBackground": true
+    }
+  }
+]

@@ -1,0 +1,14 @@
+{
+  "id": "app-showcase",
+  "version": "1.0.0",
+  "description": "Polished app showcase card: hero screenshot/icon, title, subtitle, optional CTA pill.",
+  "tags": ["narrative", "promo", "animated"],
+  "props": {
+    "image": { "type": "string", "required": false, "description": "URL or data URI for the hero image / app icon" },
+    "title": { "type": "string", "required": true, "example": "Argo" },
+    "subtitle": { "type": "string", "required": false, "example": "Demo videos, locally" },
+    "cta": { "type": "string", "required": false, "example": "Get started" },
+    "accentColor": { "type": "string", "required": false, "default": "#0ea5e9" }
+  },
+  "attribution": "Inspired by the hyperframes block of the same name (Apache-2.0). Implementation is original."
+}
